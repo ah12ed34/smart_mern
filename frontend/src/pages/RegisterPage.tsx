@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import { useRef, useState } from "react";
 import { BASE_URL } from "../constants/baseUrl";
 import { useAuth } from "../context/Auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
   const [error, setError] = useState("");
@@ -13,6 +14,8 @@ const RegisterPage = () => {
   const lastNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const navigate = useNavigate();
 
   const { login } = useAuth();
 
@@ -23,8 +26,8 @@ const RegisterPage = () => {
     const password = passwordRef.current?.value;
 
     // Validate the form data
-    if(!firstName || !lastName || !email || !password) {
-      setError('Check submitted data.')
+    if (!firstName || !lastName || !email || !password) {
+      setError("Check submitted data.");
       return;
     }
 
@@ -49,12 +52,13 @@ const RegisterPage = () => {
 
     const token = await response.json();
 
-    if(!token) {
-      setError("Incorrect token")
+    if (!token) {
+      setError("Incorrect token");
       return;
     }
 
-    login(email, token)
+    login(email, token);
+    navigate("/");
   };
 
   return (
