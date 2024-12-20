@@ -43,19 +43,36 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
           title: product.title,
           image: product.image,
           quantity,
-          unitPrice,
+          unitPrice
         })
       );
 
       setCartItems(cartItemsMapped);
       setTotalAmount(cart.totalAmount);
+
+          // استرجاع المنتجات من localStorage وإضافتها للسلة
+      const savedCart = JSON.parse(localStorage.getItem("tempCart") || "[]");
+      for (const item of savedCart) {
+        await addItemToCart(item.productId);
+      }
+
+      // حذف المنتجات المؤقتة من localStorage بعد تسجيل الدخول
+      localStorage.removeItem("tempCart");
     };
 
     fetchCart();
   }, [token]);
 
   const addItemToCart = async (productId: string) => {
+    
     try {
+      if(!token) {
+        const savedCart = JSON.parse(localStorage.getItem("tempCart") || "[]");
+        const updatedCart = [...savedCart, { productId, quantity: 1 }];
+        localStorage.setItem("tempCart", JSON.stringify(updatedCart));
+        window.location.href = "/login";
+        return;
+      }
       const response = await fetch(`${BASE_URL}/cart/items`, {
         method: "POST",
         headers: {
@@ -67,19 +84,21 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
           quantity: 1,
         }),
       });
-
+  
       if (!response.ok) {
         setError("Failed to add to cart");
+        return; // تأكد من الخروج إذا فشلت العملية
       }
-
+  
       const cart = await response.json();
-
+  
       if (!cart) {
         setError("Failed to parse cart data");
+        return; // تأكد من الخروج إذا فشلت عملية التحليل
       }
-
+  
+      // تحديث حالة السلة مباشرة بعد إضافة المنتج
       const cartItemsMapped = cart.items.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ({ product, quantity }: { product: any; quantity: number }) => ({
           productId: product._id,
           title: product.title,
@@ -88,9 +107,9 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
           unitPrice: product.unitPrice,
         })
       );
-
-      setCartItems([...cartItemsMapped]);
-      setTotalAmount(cart.totalAmount);
+  
+      setCartItems(cartItemsMapped);
+      setTotalAmount(cart.totalAmount); // تأكد من تحديث المجموع الكلي
     } catch (error) {
       console.error(error);
     }
@@ -112,12 +131,14 @@ const CartProvider: FC<PropsWithChildren> = ({ children }) => {
 
       if (!response.ok) {
         setError("Failed to update to cart");
+        return;
       }
 
       const cart = await response.json();
 
       if (!cart) {
         setError("Failed to parse cart data");
+        return;
       }
 
       const cartItemsMapped = cart.items.map(

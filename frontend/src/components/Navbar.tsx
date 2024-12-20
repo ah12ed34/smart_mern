@@ -36,6 +36,9 @@ function Navbar() {
   const handleLogin = () => {
     navigate("/login");
   };
+  const handleRegister = () => {
+    navigate("/register");
+  }
 
   const handleLogout = () => {
     logout();
@@ -147,13 +150,27 @@ function Navbar() {
                   </Menu>
                 </>
               ) : (
-                <Button
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  gap={2}>
+                  <Button
                   variant="contained"
                   color="success"
                   onClick={handleLogin}
                 >
                   Login
                 </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleRegister}
+                >
+                  Register
+                </Button>
+
+                </Box>
+                
               )}
             </Box>
           </Box>

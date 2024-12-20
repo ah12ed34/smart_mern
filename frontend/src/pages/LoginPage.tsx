@@ -88,6 +88,9 @@ const LoginPage = () => {
           <Button onClick={onSubmit} variant="contained">
             Login
           </Button>
+          <Typography variant="body2">
+            Don't have an account? <a href="/register">Register</a>
+          </Typography>
           {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
         </Box>
       </Box>
